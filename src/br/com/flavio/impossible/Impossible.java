@@ -10,15 +10,16 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class Impossible extends SurfaceView implements Runnable{
-	private boolean running = false;
 	private Thread renderThread = null;
 	private Paint paint;
 	private SurfaceHolder holder;
 	private int playerX = 300, playerY = 300, playerRadius = 50;
 	private int enemyX, enemyY, enemyRadius = 50;
 	private double distance;
-	private boolean gameOver;
+	private boolean gameOver = false;
 	private int score;
+	
+	private int ballY1 = 0;
 
 	public Impossible(Context context) {
 		super(context);
@@ -28,44 +29,55 @@ public class Impossible extends SurfaceView implements Runnable{
 
 	@Override
 	public void run() {
-		while (running) {
+		while (gameOver) {
 			
-			//System.out.println("Impossible!!");
-			//verifica se a tela está pronta
+			//check screen
 			if(!holder.getSurface().isValid()){
 				continue;
 			}
 			
-			//bloqueia canvas
-			Canvas canvas = holder.lockCanvas();
-			//canvas.drawColor(Color.BLACK);
-			canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.sky),0, 0, null);
-			
-			
-			
-			//desenha o player e o enemy
-			drawPlayer(canvas);
-			drawEnemy(canvas);
-			
-			//detecta colisão
-			checkCollision(canvas);
-			
-			
-			//atualiza o placar
-			drawScore(canvas);
-			
-			//Restart e Exit
-			drawButton(canvas);
-			
-			if(gameOver){
-				stopGame(canvas);
-				running = false;
-			}
-			
-			//atualiza e libera o canvas
-			holder.unlockCanvasAndPost(canvas);
-			
+			processCanvas();
 		}
+	}
+	
+	/**
+	 * 
+	 */
+	private void processCanvas(){
+		
+		//block canvas
+		Canvas canvas = holder.lockCanvas();
+		
+		playGame(canvas);
+		
+		//update and release canvas
+		holder.unlockCanvasAndPost(canvas);
+	}
+
+	/**
+	 * @param canvas
+	 */
+	private void playGame(Canvas canvas) {
+		canvas.drawBitmap(BitmapFactory.decodeResource(getResources(), R.drawable.sky),0, 0, null);
+		
+		//paint player, enemy and balls
+		drawPlayer(canvas);
+		drawEnemy(canvas);
+		drawBall(canvas);
+		
+		//detect collision
+		checkCollision(canvas);
+		
+		//update score
+		drawScore(canvas);
+		
+		//Restart and Exit
+		drawButton(canvas);
+		
+		if(gameOver){
+			stopGame(canvas);
+		}
+		
 	}
 	
 	private void drawPlayer(Canvas canvas){
@@ -82,11 +94,13 @@ public class Impossible extends SurfaceView implements Runnable{
 	}
 	
 	/**
-	 * Desenha bolinhas
+	 * Paint ball
 	 * @param canvas
 	 */
 	private void drawBall(Canvas canvas){
-		
+		paint.setColor(Color.RED);
+		canvas.drawCircle(200, ballY1, 10, paint);
+		ballY1 = ballY1 + 10;
 	}
 	
 	private void checkCollision(Canvas canvas){
@@ -99,7 +113,7 @@ public class Impossible extends SurfaceView implements Runnable{
 	}
 	
 	public void resume(){
-		running = true;
+		gameOver = true;
 		renderThread = new Thread(this);
 		renderThread.start();
 	}
@@ -138,7 +152,7 @@ public class Impossible extends SurfaceView implements Runnable{
 		canvas.drawText("EXIT", 50, 500, paint);
 	}
 	
-	public void init(){
+	public void restart(){
 		enemyX = enemyY = enemyRadius = 0;
 		playerX = playerY = 300;
 		playerRadius = 50;

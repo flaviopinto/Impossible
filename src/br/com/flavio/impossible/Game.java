@@ -37,7 +37,7 @@ public class Game extends Activity implements OnTouchListener{
 		view.addScore(100);
 		
 		if(event.getX() < 100 && event.getY() > 290 && event.getY() < 310){
-			view.init();
+			view.restart();
 		}
 		
 		if(event.getX() < 100 && event.getY() > 490 && event.getY() < 510){
