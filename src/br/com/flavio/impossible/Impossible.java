@@ -18,6 +18,7 @@ public class Impossible extends SurfaceView implements Runnable{
 	private double distance;
 	private boolean gameOver = false;
 	private int score;
+	private Enemy[] vectEnemy = new Enemy[5];
 	
 	private int ballY1 = 0;
 
@@ -63,7 +64,7 @@ public class Impossible extends SurfaceView implements Runnable{
 		//paint player, enemy and balls
 		drawPlayer(canvas);
 		drawEnemy(canvas);
-		drawBall(canvas);
+		//drawBall(canvas);
 		
 		//detect collision
 		checkCollision(canvas);
@@ -75,7 +76,7 @@ public class Impossible extends SurfaceView implements Runnable{
 		drawButton(canvas);
 		
 		if(gameOver){
-			stopGame(canvas);
+			//stopGame(canvas);
 		}
 		
 	}
@@ -89,10 +90,19 @@ public class Impossible extends SurfaceView implements Runnable{
 	
 	private void drawEnemy(Canvas canvas){
 		paint.setColor(Color.GRAY);
-		enemyRadius++;
-		canvas.drawCircle(enemyX, enemyY, enemyRadius, paint);
+		//enemyRadius++;
+		
+		for (int i = 0; i < vectEnemy.length; i++) {
+			drawEnemy(canvas, i);
+		}
+		
 	}
 	
+	private void drawEnemy(Canvas canvas, int i) {
+		canvas.drawCircle(vectEnemy[i].getEnemyX(), vectEnemy[i].getEnemyY(), vectEnemy[i].getEnemyRadius(), paint);
+		vectEnemy[i].addEnemyY();
+	}
+
 	/**
 	 * Paint ball
 	 * @param canvas
@@ -113,13 +123,41 @@ public class Impossible extends SurfaceView implements Runnable{
 	}
 	
 	public void resume(){
+		addEnemy();
 		gameOver = true;
 		renderThread = new Thread(this);
 		renderThread.start();
 	}
 	
+	private void addEnemy() {
+		for (int i = 0; i < vectEnemy.length; i++) {
+			Enemy enemy = new Enemy();
+			vectEnemy[i] = enemy; 
+		}
+	}
+
 	public void moveDown(int pixel){
 		playerY += pixel;
+	}
+	
+	public void moveUp(int pixel){
+		playerY -= pixel;
+	}
+	
+	public void moveLeft(int pixel){
+		playerX -= pixel;
+	}
+	
+	public void moveRight(int pixel){
+		playerX += pixel;
+	}
+	
+	public int getPlayerX(){
+		return playerX;
+	}
+	
+	public int getPlayerY(){
+		return playerY;
 	}
 	
 	private void stopGame(Canvas canvas){

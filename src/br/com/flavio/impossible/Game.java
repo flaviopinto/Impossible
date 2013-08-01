@@ -33,18 +33,46 @@ public class Game extends Activity implements OnTouchListener{
 
 	@Override
 	public boolean onTouch(View v, MotionEvent event) {
-		view.moveDown(10);
+		
+		moveX(event);
+		
+		moveY(event);
+		
 		view.addScore(100);
 		
-		if(event.getX() < 100 && event.getY() > 290 && event.getY() < 310){
-			view.restart();
-		}
+		restartGame(event);
 		
+		exitGame(event);
+		
+		return true;
+	}
+
+	private void exitGame(MotionEvent event) {
 		if(event.getX() < 100 && event.getY() > 490 && event.getY() < 510){
 			System.exit(0);
 		}
-		
-		return true;
+	}
+
+	private void restartGame(MotionEvent event) {
+		if(event.getX() < 100 && event.getY() > 290 && event.getY() < 310){
+			view.restart();
+		}
+	}
+
+	private void moveY(MotionEvent event) {
+		if(event.getY() > view.getPlayerY()){
+			view.moveDown(10);
+		}else{
+			view.moveUp(10);
+		}
+	}
+
+	private void moveX(MotionEvent event) {
+		if(event.getX() > view.getPlayerX()){
+			view.moveRight(10);
+		}else{
+			view.moveLeft(10);
+		}
 	}
     
     
